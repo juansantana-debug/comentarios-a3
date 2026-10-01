@@ -42,6 +42,9 @@ html{line-height:1.5}h1,h2,h3,p{margin:0}button{color:inherit}img,svg{display:bl
 // CONEXÃO: substitua somente esta URL pela nova implantação /exec.
 const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyiMCW34MNxhJpeAE44vsf51WAZSp4Zkdy8pczLFeAWnJtaRExnDp7S5ErwI34HsMNt/exec";
 const SEND_TIMEOUT_MS = 12000;
+const TOTAL_SEND_TIMEOUT_MS = 25000;
+function nativeConnection(){return !!globalThis.google?.script?.run;}
+function connectionReady(){return nativeConnection() || !!endpoint();}
 const projects = [{"number":1,"name":"Estudar e melhorar o processo de recrutamento, seleção, contratação de pessoal e retenção de talentos (SP).","leader":"Raphaela Melo","a3Url":"https://drive.google.com/file/d/1A9oUxfZz7yyYh6iNbKmZh-51yoWRMFkj/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":2,"name":"Estudar e melhorar o processo de recrutamento, seleção, contratação de pessoal e retenção de talentos (Regionais).","leader":"Luana","a3Url":"https://drive.google.com/file/d/1faN-0FOACmwZCVznA8D82yH3ihBZu80F/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":3,"name":"Melhoria do processo de compras (interface com operações).","leader":"Rogério Ferreira","a3Url":"https://drive.google.com/file/d/1OliEmVQQ4QXJg414wfq_Mwm8duuOIkfs/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":4,"name":"Melhoria do processo de recebimento e distribuição de materiais/produtos (Supply).","leader":"Sidney Oliveira","a3Url":"https://drive.google.com/file/d/1QjZXdQ1uSLlb3d9QANtNPbKhV3xiLvt0/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":5,"name":"Desenvolver um processo efetivo de planejamento, dimensionamento da estrutura e controle dos recursos e equipes, buscando eficiência operacional para suportar o crescimento do negócio.","leader":"Pedro Paulo","a3Url":"https://drive.google.com/file/d/1-JQ-O6EwWiGKCxN8j6Z7U5R9rWT_go6y/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":6,"name":"Definir, padronizar, digitalizar e automatizar os processos operacionais.","leader":"Carlos Melo","a3Url":"https://drive.google.com/file/d/159SB5GDUr5G4x1ORURcPVQP_Yqo8g4Pj/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":7,"name":"Estudar e melhorar os processos de planejamento para melhorar a eficiência operacional (Concessão).","leader":"Fernando Queiroz","a3Url":"https://drive.google.com/file/d/1Eok89gugB5m2TxeSsFH4Jtzp6163m43A/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":8,"name":"Estudar e melhorar os processos de planejamento para melhorar a eficiência operacional (Outras verticais).","leader":"Iranildo Melo","a3Url":"https://drive.google.com/file/d/1EVGWql-QdeXATxJM3KNOM8o4vEj6H3dA/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":9,"name":"Organizar processo robusto de desenvolvimento de projetos de engenharia - APQP (Geral).","leader":"Gerra Guedes","a3Url":"https://drive.google.com/file/d/1WyPQfwkJG6EAFgwZuE4t7kECEb8lf0Ow/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":10,"name":"Realizar implantações efetivas - Tempo e custo (Concessões).","leader":"Carlos Prevedel","a3Url":"https://drive.google.com/file/d/1FuQcDEL_IxnYNeGsfImGfI0lrOboxDPa/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":11,"name":"Realizar implantações efetivas - Tempo e custo (Outras verticais - Edifícios, shoppings, aeroportos, clubes, trilhos).","leader":"Laiana Tamion","a3Url":"https://drive.google.com/file/d/1mGyBGcvVyyoBNIH6S7a5AjOoshwJr2IT/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":12,"name":"Desenvolver, aprovar e controlar de maneira efetiva o processo de CAPEX.","leader":"Tacito","a3Url":"https://drive.google.com/file/d/1GEyECcm3iNhL2PKoZi_m3sijktk24FKq/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":13,"name":"Desenvolver, aprovar e controlar de maneira efetiva o processo de OPEX.","leader":"Luciana Salles","a3Url":"https://drive.google.com/file/d/1xhs96ujDao9Ftoqux6QrMQiIM7beNJ_P/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":14,"name":"Otimizar o processo de gestão da frota (locadoras).","leader":"Ricardo Luz","a3Url":"https://drive.google.com/file/d/18AiLRewhL7z6gNKNFjMGUMIUMXL_6_W8/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":15,"name":"Otimizar o processo de gestão da frota (combustível, multas, seguros, etc).","leader":"Igor Sousa","a3Url":"https://drive.google.com/file/d/1gQgAnJ03eovnkZG5Uww5uYHKDqlEIbiz/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":16,"name":"Avaliar, melhorar e padronizar o processo de roteirização.","leader":"Matheus Menezes","a3Url":"https://drive.google.com/file/d/19r_gpJ8OoPUp6Fy2ZHBfq56jVl9MBnle/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":17,"name":"Definir um processo de monitoramento da gestão dos projetos (Flow Leader).","leader":"Carisma Paim","a3Url":"https://drive.google.com/file/d/1mdGPnCoGbAyWN5k1bjSp-qYBBgqq3owC/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":18,"name":"Desenvolver sistema documentado de gestão operacional (Parte integral do sistema de gestão de negocio/qualidade).","leader":"Renata Paulino","a3Url":"https://drive.google.com/file/d/1jB2i6-D0zg8oAcawVec0VlQb98vE-h2L/view?usp=drivesdk","a3AdditionalDocuments":[{"name":"LSS 18 A3 Renata Desenvolver sistema documentado de gestao operacional (Parte integral do sistema de gestao de negocioqualidade).pdf","url":"https://drive.google.com/file/d/14grfbFKxOsn3HZBEEHO6zJLidMF7zc5C/view?usp=drivesdk"}]},{"number":19,"name":"Utilizar inteligência de dados IOT HUB para ser mais ágil na tomada de decisões e melhorias de performance.","leader":"Thomas","a3Url":"https://drive.google.com/file/d/1NrMd6Bw-zXUzWOMi3LaVpiC-kCFMt46m/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":20,"name":"Utilizar inteligência de dados para ser mais ágil na tomada de decisões e melhorias de performance.","leader":"Nicolas de Libreti","a3Url":"https://drive.google.com/file/d/1PpqOJM8KcqKW7npHT9qFF1-QMW9u5JN4/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":21,"name":"Estabelecer interface efetiva entre Operações e RIG.","leader":"Mariana Siqueira","a3Url":"https://drive.google.com/file/d/1Bt9uuWYGeRIVulmE4ShlhI5pMaQblcLI/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":22,"name":"Estabelecer processo efetivo de monitoramento de chamados.","leader":"Mateus Cirilo","a3Url":"https://drive.google.com/file/d/1kzmM5oyvcR1LkbtS2O58_GscOuN7YznP/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":23,"name":"Estudar e simplificar o processo de evidências através de foto e melhorar a efetividade no uso e funcionalidade do sistema Field Service (EFS).","leader":"William Pinheiro","a3Url":"https://drive.google.com/file/d/1dOiv6QyNk5vzwUNhiY7yBpMtCaxE7p7f/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":24,"name":"Estudar e melhorar o processo de treinamento, avaliação e desenvolvimento de pessoas.","leader":"Ana Cláudia","a3Url":"https://drive.google.com/file/d/1k_CQ8z04eseTBUF_AE87HRw3kdXSF_i0/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":25,"name":"Estabelecer processo de cadência de responsabilidade para melhoria da performance (Rendição de contas).","leader":"Carolina Bergantini","a3Url":"https://drive.google.com/file/d/1WKfYPTzLOXNpEHVLZApDa7ZRj37fzpGD/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":27,"name":"Avaliar e melhorar programa de manutenção preventiva, melhorando o diagnóstico de falhas (São Paulo).","leader":"Francisco Souza","a3Url":"https://drive.google.com/file/d/1DL01mW3VxQLq3Y01keAddv6d5z6ejTYi/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":28,"name":"Avaliar e melhorar programa de manutenção preventiva, melhorando o diagnóstico de falhas (Regionais).","leader":"Natalia Ribeiro","a3Url":"https://drive.google.com/file/d/1iX8oA7QikRBNHc2a-64r6xzupfcFEMce/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":29,"name":"Implementar processo ágil e efetivo de manutenção corretiva, melhorando o diagnóstico de falhas.","leader":"Bruno Barreto","a3Url":"https://drive.google.com/file/d/1CQb9ZmDVWkjsm-iRoIItFigscLjyhu9M/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":30,"name":"Criar e implementar modelo de desenvolvimento de fornecedores para acompanhar o crescimento.","leader":"Lucas Borges","a3Url":"https://drive.google.com/file/d/1t34edDMe2plYdJvlQD74er1vUs3Cz74a/view?usp=drivesdk","a3AdditionalDocuments":[]},{"number":31,"name":"Desenvolver e implementar processo efetivo de gestão de energia elétrica.","leader":"Rodrigo Ventura","a3Url":"https://drive.google.com/file/d/1_iUY2CmWBBaKK052DwqNgamVwemGvi4G/view?usp=drivesdk","a3AdditionalDocuments":[]}];
 const $ = id => document.getElementById(id);
 const dialog = $("project-dialog");
@@ -56,7 +59,7 @@ form.after(success);
 function makeId(){if(globalThis.crypto?.randomUUID)return crypto.randomUUID();const b=new Uint8Array(16);crypto.getRandomValues(b);b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=Array.from(b,n=>n.toString(16).padStart(2,"0")).join("");return [h.slice(0,8),h.slice(8,12),h.slice(12,16),h.slice(16,20),h.slice(20)].join("-");}
 function endpoint(){try{const u=new URL(GOOGLE_SHEETS_URL);if(u.protocol==="https:"&&u.hostname==="script.google.com"&&/^\/(?:a\/macros\/[a-z0-9.-]+|macros)\/s\/[a-z0-9_-]+\/exec$/i.test(u.pathname))return u;}catch{}return null;}
 function clearError(){error.textContent="";error.classList.add("hidden");}
-function resetComment(){form.reset();$("project-name").value=String(selected.number).padStart(2,"0")+" · "+selected.name;$("comment-count").textContent="0/3000";requestId=makeId();form.hidden=false;success.classList.add("hidden");clearError();notice.classList.toggle("hidden",!!endpoint());notice.textContent="O recebimento de comentários está em preparação. O envio será liberado em breve.";button.disabled=!endpoint();}
+function resetComment(){form.reset();$("project-name").value=String(selected.number).padStart(2,"0")+" · "+selected.name;$("comment-count").textContent="0/3000";requestId=makeId();form.hidden=false;success.classList.add("hidden");clearError();notice.classList.toggle("hidden",connectionReady());notice.textContent="O recebimento de comentários está em preparação. O envio será liberado em breve.";button.disabled=!connectionReady();}
 function openProject(project, card){if(sending)return;selected=project;previousFocus=card;dialog.querySelector(".detail-number").innerHTML=String(project.number).padStart(2,"0")+'<span>.</span>';$("detail-title").textContent=project.name;dialog.querySelector(".detail-leader strong").textContent=project.leader;dialog.querySelector(".a3-access").href=project.a3Url;const old=dialog.querySelector(".additional-documents");if(old)old.remove();if(project.a3AdditionalDocuments.length){const wrap=document.createElement("div");wrap.className="additional-documents";const label=document.createElement("span");label.textContent="DOCUMENTO ADICIONAL";wrap.append(label);for(const doc of project.a3AdditionalDocuments){const a=document.createElement("a");a.href=doc.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=doc.name;wrap.append(a);}dialog.querySelector(".detail-bottom").before(wrap);}resetComment();dialog.showModal();document.body.style.overflow="hidden";$("dialog-close").focus();}
 function closeProject(){if(sending)return;dialog.close();document.body.style.overflow="";previousFocus?.focus();}
 document.querySelectorAll(".project-card").forEach((card,i)=>card.addEventListener("click",()=>openProject(projects[i],card)));
@@ -97,20 +100,77 @@ success.querySelector("button").addEventListener("click",()=>{resetComment();$("
       }
     }
 
-// Confirmação separada: Beacon/no-cors apenas solicitam o envio, sem comprovar gravação.
-function receipt(id){return new Promise((resolve,reject)=>{const cb="a3_cb_"+makeId().replaceAll("-","");const script=document.createElement("script");const url=endpoint();url.searchParams.set("action","status");url.searchParams.set("requestId",id);url.searchParams.set("callback",cb);url.searchParams.set("t",Date.now());let timer;const clean=()=>{clearTimeout(timer);script.remove();delete window[cb];};window[cb]=data=>{clean();resolve(data);};script.onerror=()=>{clean();reject(new Error("Não foi possível consultar a confirmação."));};timer=setTimeout(()=>{clean();reject(new Error("A confirmação não respondeu."));},9000);script.src=url.href;document.head.append(script);});}
-async function waitForReceipt(id){const deadline=Date.now()+60000;while(Date.now()<deadline){await new Promise(resolve=>setTimeout(resolve,2000));let result;try{result=await receipt(id);}catch{continue;}if(result?.requestId!==id)continue;if(result.ok===true)return;if(result.status==="error")throw new Error(result.message||"Não foi possível gravar o comentário.");}throw new Error("Não foi possível confirmar o registro na planilha. Tente novamente; seu texto foi preservado.");}
+// Todas as esperas pertencem ao mesmo limite total de 25 segundos.
+function abortError(){return new Error("O serviço não respondeu em 25 segundos. Seu texto foi preservado. Tente novamente; o mesmo envio não será duplicado.");}
+function receipt(id, signal){
+ return new Promise((resolve,reject)=>{
+  if(signal.aborted)return reject(abortError());
+  const cb="a3_cb_"+makeId().replaceAll("-","");
+  const script=document.createElement("script");const url=endpoint();
+  if(!url)return reject(new Error("Insira a URL /exec da implantação atual do Apps Script."));
+  url.searchParams.set("action","status");url.searchParams.set("requestId",id);url.searchParams.set("callback",cb);url.searchParams.set("t",Date.now());
+  let timer,settled=false;
+  const clean=()=>{clearTimeout(timer);script.remove();signal.removeEventListener("abort",onAbort);delete window[cb];};
+  const finish=(error,data)=>{if(settled)return;settled=true;clean();error?reject(error):resolve(data);};
+  const onAbort=()=>finish(abortError());
+  window[cb]=data=>finish(null,data);
+  script.onerror=()=>finish(new Error("A confirmação foi bloqueada ou a URL não está acessível. Confira a implantação do Apps Script."));
+  script.onload=()=>{if(!settled)finish(new Error("A URL não retornou a confirmação esperada. Atualize o Code.gs e publique uma nova versão da implantação."));};
+  signal.addEventListener("abort",onAbort,{once:true});
+  timer=setTimeout(()=>finish(new Error("O serviço de confirmação não respondeu.")),5000);
+  script.src=url.href;document.head.append(script);
+ });
+}
+function pause(ms,signal){return new Promise((resolve,reject)=>{if(signal.aborted)return reject(abortError());let timer;const onAbort=()=>{clearTimeout(timer);reject(abortError());};signal.addEventListener("abort",onAbort,{once:true});timer=setTimeout(()=>{signal.removeEventListener("abort",onAbort);resolve();},ms);});}
+async function waitForReceipt(id,signal){
+ let failures=0;
+ while(!signal.aborted){
+  await pause(1500,signal);
+  let result;
+  try{result=await receipt(id,signal);failures=0;}
+  catch(error){if(signal.aborted)throw abortError();if(++failures>=2)throw error;continue;}
+  if(result?.requestId!==id)throw new Error("A confirmação recebida não corresponde a este comentário. Confira a URL da implantação.");
+  if(result.ok===true)return;
+  if(result.status==="error")throw new Error(result.message||"Não foi possível gravar o comentário.");
+ }
+ throw abortError();
+}
+function nativeSend(payload,signal){
+ return new Promise((resolve,reject)=>{
+  let settled=false;
+  const done=(error,result)=>{if(settled)return;settled=true;signal.removeEventListener("abort",onAbort);error?reject(error):resolve(result);};
+  const onAbort=()=>done(abortError());
+  if(signal.aborted)return onAbort();
+  signal.addEventListener("abort",onAbort,{once:true});
+  try{google.script.run.withSuccessHandler(result=>{
+    if(result?.ok!==true||result.requestId!==payload.requestId)return done(new Error(result?.message||"A gravação não foi confirmada."));
+    done(null,result);
+   }).withFailureHandler(error=>done(new Error(error?.message||"Não foi possível gravar. Atualize o Code.gs e a implantação."))).registrarComentario(payload);
+  }catch(error){done(error);}
+ });
+}
+function withAbort(work,signal){return new Promise((resolve,reject)=>{let settled=false;const done=(error,value)=>{if(settled)return;settled=true;signal.removeEventListener("abort",onAbort);error?reject(error):resolve(value);};const onAbort=()=>done(abortError());if(signal.aborted)return onAbort();signal.addEventListener("abort",onAbort,{once:true});Promise.resolve(work).then(value=>done(null,value),error=>done(error));});}
 form.addEventListener("submit",async event=>{
  event.preventDefault();if(sending||!selected)return;clearError();
  const author=$("author").value.trim(),comment=$("comment").value.trim();
- if(!endpoint()){error.textContent="Insira a nova URL /exec em GOOGLE_SHEETS_URL para ativar a conexão.";error.classList.remove("hidden");return;}
+ if(!connectionReady()){error.textContent="Insira a nova URL /exec em GOOGLE_SHEETS_URL para ativar a conexão.";error.classList.remove("hidden");return;}
  if(author.length<2||author.length>100||comment.length<5||comment.length>3000){error.textContent="Confira seu nome e o comentário.";error.classList.remove("hidden");return;}
  if(navigator.onLine===false){error.textContent="Você está sem conexão. Seu texto foi preservado.";error.classList.remove("hidden");return;}
  const payload={requestId,projectNumber:selected.number,projectName:selected.name,projectLeader:selected.leader,author,comment,nome:author,comentario:comment,projetoId:selected.number,projetoTitulo:selected.name,lider:selected.leader,projeto:selected.name};
  sending=true;button.disabled=true;$("dialog-close").disabled=true;$("author").disabled=true;$("comment").disabled=true;const original=button.innerHTML;button.textContent="Enviando…";
- try{await sendToAppsScript(JSON.stringify(payload));button.textContent="Confirmando…";await waitForReceipt(requestId);form.hidden=true;success.classList.remove("hidden");success.querySelector("button").focus();}
+ const controller=new AbortController();
+ const watchdog=setTimeout(()=>controller.abort(),TOTAL_SEND_TIMEOUT_MS);
+ try{
+  if(nativeConnection()){
+   await nativeSend(payload,controller.signal);
+  }else{
+   await withAbort(sendToAppsScript(JSON.stringify(payload)),controller.signal);
+   button.textContent="Confirmando…";
+   await waitForReceipt(requestId,controller.signal);
+  }
+  form.hidden=true;success.classList.remove("hidden");success.querySelector("button").focus();}
  catch(e){error.textContent=e.message||"Não foi possível enviar. Seu texto foi preservado.";error.classList.remove("hidden");}
- finally{sending=false;button.disabled=false;$("dialog-close").disabled=false;$("author").disabled=false;$("comment").disabled=false;button.innerHTML=original;}
+ finally{clearTimeout(watchdog);controller.abort();sending=false;button.disabled=false;$("dialog-close").disabled=false;$("author").disabled=false;$("comment").disabled=false;button.innerHTML=original;}
 });
 
 </script>
