@@ -102,39 +102,6 @@ success.querySelector("button").addEventListener("click",()=>{resetComment();$("
 
 // Todas as esperas pertencem ao mesmo limite total de 25 segundos.
 function abortError(){return new Error("O serviço não respondeu em 25 segundos. Seu texto foi preservado. Tente novamente; o mesmo envio não será duplicado.");}
-function receipt(id, signal){
- return new Promise((resolve,reject)=>{
-  if(signal.aborted)return reject(abortError());
-  const cb="a3_cb_"+makeId().replaceAll("-","");
-  const script=document.createElement("script");const url=endpoint();
-  if(!url)return reject(new Error("Insira a URL /exec da implantação atual do Apps Script."));
-  url.searchParams.set("action","status");url.searchParams.set("requestId",id);url.searchParams.set("callback",cb);url.searchParams.set("t",Date.now());
-  let timer,settled=false;
-  const clean=()=>{clearTimeout(timer);script.remove();signal.removeEventListener("abort",onAbort);delete window[cb];};
-  const finish=(error,data)=>{if(settled)return;settled=true;clean();error?reject(error):resolve(data);};
-  const onAbort=()=>finish(abortError());
-  window[cb]=data=>finish(null,data);
-  script.onerror=()=>finish(new Error("A confirmação foi bloqueada ou a URL não está acessível. Confira a implantação do Apps Script."));
-  script.onload=()=>{if(!settled)finish(new Error("A URL não retornou a confirmação esperada. Atualize o Code.gs e publique uma nova versão da implantação."));};
-  signal.addEventListener("abort",onAbort,{once:true});
-  timer=setTimeout(()=>finish(new Error("O serviço de confirmação não respondeu.")),5000);
-  script.src=url.href;document.head.append(script);
- });
-}
-function pause(ms,signal){return new Promise((resolve,reject)=>{if(signal.aborted)return reject(abortError());let timer;const onAbort=()=>{clearTimeout(timer);reject(abortError());};signal.addEventListener("abort",onAbort,{once:true});timer=setTimeout(()=>{signal.removeEventListener("abort",onAbort);resolve();},ms);});}
-async function waitForReceipt(id,signal){
- let failures=0;
- while(!signal.aborted){
-  await pause(1500,signal);
-  let result;
-  try{result=await receipt(id,signal);failures=0;}
-  catch(error){if(signal.aborted)throw abortError();if(++failures>=2)throw error;continue;}
-  if(result?.requestId!==id)throw new Error("A confirmação recebida não corresponde a este comentário. Confira a URL da implantação.");
-  if(result.ok===true)return;
-  if(result.status==="error")throw new Error(result.message||"Não foi possível gravar o comentário.");
- }
- throw abortError();
-}
 function nativeSend(payload,signal){
  return new Promise((resolve,reject)=>{
   let settled=false;
@@ -163,10 +130,13 @@ form.addEventListener("submit",async event=>{
  try{
   if(nativeConnection()){
    await nativeSend(payload,controller.signal);
+   success.querySelector("h3").textContent="Comentário registrado";
+   success.querySelector("p").textContent="Seu comentário foi registrado. Obrigado pela contribuição.";
   }else{
    await withAbort(sendToAppsScript(JSON.stringify(payload)),controller.signal);
-   button.textContent="Confirmando…";
-   await waitForReceipt(requestId,controller.signal);
+   // A resposta opaca/Beacon não comprova gravação: não consultar JSONP bloqueado.
+   success.querySelector("h3").textContent="Envio solicitado";
+   success.querySelector("p").textContent="Obrigado pela contribuição.";
   }
   form.hidden=true;success.classList.remove("hidden");success.querySelector("button").focus();}
  catch(e){error.textContent=e.message||"Não foi possível enviar. Seu texto foi preservado.";error.classList.remove("hidden");}
